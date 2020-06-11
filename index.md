@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta http-equiv="X-UA-Compatible" content="IE=EDGE"/>
+ <meta charset="utf-8"/>
+ <meta name="Generator" content="Xara HTML filter v.9.6.0.33"/>
+ <meta name="XAR Files" content="index_html_files/xr_files.txt"/>
+ <title>index</title>
+ <meta name="viewport" content="width=device-width, initial-scale=1" />
+ <link rel="stylesheet" href="index_html_files/xr_fonts.css"/>
+ <script><!--
+ if(navigator.userAgent.indexOf('MSIE')!=-1 || navigator.userAgent.indexOf('Trident')!=-1){ document.write('<link rel="stylesheet" href="index_html_files/xr_fontsie.css"/>');} 
+--></script>
+ <script>document.documentElement.className="xr_bgh0";</script>
+ <link rel="stylesheet" href="index_html_files/xr_main.css"/>
+ <link rel="stylesheet" href="index_html_files/custom_styles.css"/>
+ <link rel="stylesheet" href="index_html_files/xr_text.css"/>
+ <script src="index_html_files/roe.js"></script>
+ <link rel="stylesheet" href="index_html_files/ani.css"/>
+ <style>
+  #xr_xr {top:0px;}
+ </style>
+</head>
+<body class="xr_bgb0">
+<div class="xr_ap" id="xr_xr" style="width: 960px; height: 541px; left:50%; margin-left: -480px; text-align: left; top:0px;">
+ <script>var xr_xr=document.getElementById("xr_xr")</script>
+<div id="xr_td" class="xr_td">
+<div class="xr_ap xr_xri_" style="width: 960px; height: 541px;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/1.jpg" alt="" title="" style="left:0px;top:0px;width:962px;height:541px;"/>
+ <div class="xr_txt Normal_text xr_s0" style="position: absolute; left:292px; top:139px; width:319px; height:10px;">
+  <span class="xr_tl Normal_text xr_s0" style="top: -20.96px;">Test Website in Xara on Github</span>
+ </div>
+ <div id="xr_xo0" class="xr_ap" style="left:0; top:0; width:960px; height:100px; visibility:hidden; z-index:3;">
+ <a href="" onclick="return(false);" onmousedown="xr_ppir(this);">
+ </a>
+ </div>
+ <div id="xr_xd0"></div>
+</div>
+</div>
+</div>
+<!--[if IE]><script>xr_aeh()</script><![endif]--><!--[if !IE]>--><script>xr_htm();repMobFonts();window.addEventListener('load', xr_aeh, false);</script><!--<![endif]-->
+</body>
+</html>
