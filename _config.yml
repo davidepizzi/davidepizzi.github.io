@@ -1,2 +1,2 @@
 theme: jekyll-theme-cayman
-ignore_theme_config: 1
+keep_files: index.md
