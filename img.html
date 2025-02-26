@@ -1,0 +1,317 @@
+<html>
+<head>
+    <title>Interactive Particles</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+        }
+        svg {
+            width: 100vw;
+            height: 70vh; 
+        }
+        .particle {
+            transition: opacity 0.3s;
+        }
+        #image-container {
+            margin-top: 20px;
+            width: 100%;
+            padding-bottom: 10px; 
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* Three columns */
+            grid-gap: 10px; /* Gap between images */
+            justify-items: center; /* Center items horizontally */
+            align-items: center; /* Center items vertically */
+        }
+        .generated-image {
+            margin-top: 5px;
+            margin-left: 5px;
+            margin-right: 5px;
+            max-width: 100%;
+            max-height: 30vh;
+            object-fit: contain;
+            transform: scale(1.1);
+            transition: transform 0.3s ease;
+            cursor: pointer; /* Add cursor pointer */
+            border: 3px solid white; /* Add white border */
+        }
+
+        #prompt-input {
+            margin-top: 10px;
+            width: 80%;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        #generate-button {
+            margin-top: 10px;
+            padding: 8px 16px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #generate-button:hover {
+            background-color: #3e8e41;
+        }
+        #feedback-message {
+            margin-top: 10px;
+            font-style: italic;
+            color: #777;
+        }
+        /* Styles for the loading animation */
+        .loader-container {
+            margin-top: 10px;
+            width: 80%;
+            height: 10px;
+            background-color: #f3f3f3;
+            border-radius: 5px;
+            overflow: hidden;
+            display: none; /* Hidden by default */
+        }
+
+        .loader {
+            height: 100%;
+            width: 0%;
+            background-color: #4CAF50;
+            border-radius: 5px;
+            transition: width 0.3s ease-in-out; /* Smooth transition */
+        }
+
+        /* Styles for the modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #fff;
+            font-size: 30px;
+            cursor: pointer;
+        }
+
+        #title {
+            color: white;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="title">The Best Image Generator of the Planet</h1>
+    <input type="text" id="prompt-input" placeholder="Enter your prompt and press Enter or Generate">
+    <button id="generate-button">Generate</button>
+    <p id="feedback-message">Press Enter or click Generate to create an image.</p>
+    <div class="loader-container">
+        <div class="loader" id="image-loader"></div>
+    </div>
+    <svg id="canvas"></svg>
+    <div id="image-container">
+        <img id="generated-image-1" src="" alt="Generated Image 1" class="generated-image" style="display:none;">
+        <img id="generated-image-2" src="" alt="Generated Image 2" class="generated-image" style="display:none;">
+        <img id="generated-image-3" src="" alt="Generated Image 3" class="generated-image" style="display:none;">
+        <img id="generated-image-4" src="" alt="Generated Image 4" class="generated-image" style="display:none;">
+        <img id="generated-image-5" src="" alt="Generated Image 5" class="generated-image" style="display:none;">
+        <img id="generated-image-6" src="" alt="Generated Image 6" class="generated-image" style="display:none;">
+        <p id="error-message" style="color: red; display: none;">Error generating image.</p>
+    </div>
+
+    <!-- Modal for zoomed image -->
+    <div id="imageModal" class="modal">
+        <span class="modal-close" id="modalClose">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+    <script>
+        const params = {
+            particleCount: 100,
+            particleSize: 4,
+            mouseRadius: 80
+        };
+
+        const svgNS = 'http://www.w3.org/2000/svg';
+        const canvas = document.getElementById('canvas');
+        let particles = [];
+        let mousePos = { x: 0, y: 0 };
+
+        function createParticle() {
+            const p = {
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                vx: 0,
+                vy: 0,
+                opacity: 0.7,
+                element: document.createElementNS(svgNS, 'circle')
+            };
+            p.element.setAttribute('class', 'particle');
+            p.element.setAttribute('r', params.particleSize);
+            canvas.appendChild(p.element);
+            return p;
+        }
+
+        function updateParticles() {
+            particles.forEach(p => {
+                const dx = p.x - mousePos.x;
+                const dy = p.y - mousePos.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                
+                // Particle physics
+                if (dist < params.mouseRadius) {
+                    const angle = Math.atan2(dy, dx);
+                    const force = (params.mouseRadius - dist) * 0.1;
+                    p.vx += Math.cos(angle) * force;
+                    p.vy += Math.sin(angle) * force;
+                    p.opacity = 0.3;
+                } else {
+                    p.opacity = 0.7;
+                }
+
+                p.vx *= 0.95;
+                p.vy *= 0.95;
+                p.x += p.vx;
+                p.y += p.vy;
+
+                // Update SVG element
+                p.element.setAttribute('cx', p.x);
+                p.element.setAttribute('cy', p.y);
+                p.element.style.opacity = p.opacity;
+            });
+        }
+
+        function animate() {
+            updateParticles();
+            requestAnimationFrame(animate);
+        }
+
+        function init() {
+            // Create particles
+            particles = Array.from({length: params.particleCount}, createParticle);
+            
+            // Mouse move listener
+            window.addEventListener('mousemove', e => {
+                mousePos.x = e.clientX;
+                mousePos.y = e.clientY;
+            });
+
+            // Window resize handler
+            window.addEventListener('resize', () => {
+                canvas.setAttribute('width', window.innerWidth);
+                canvas.setAttribute('height', window.innerHeight);
+            });
+
+            animate();
+
+            // Image generation
+            const promptInput = document.getElementById('prompt-input');
+            const generatedImage1 = document.getElementById('generated-image-1');
+            const generatedImage2 = document.getElementById('generated-image-2');
+            const generatedImage3 = document.getElementById('generated-image-3');
+            const generatedImage4 = document.getElementById('generated-image-4');
+            const generatedImage5 = document.getElementById('generated-image-5');
+            const generatedImage6 = document.getElementById('generated-image-6');
+            const errorMessage = document.getElementById('error-message');
+            const generateButton = document.getElementById('generate-button');
+            const imageLoader = document.getElementById('image-loader');
+            const loaderContainer = document.querySelector('.loader-container');
+            const images = [generatedImage1, generatedImage2, generatedImage3, generatedImage4, generatedImage5, generatedImage6];
+
+            const imageModal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            const modalClose = document.getElementById('modalClose');
+
+            // Function to open modal
+            function openModal(imageSrc) {
+                modalImage.src = imageSrc;
+                imageModal.style.display = 'flex';
+            }
+
+            // Function to close modal
+            modalClose.addEventListener('click', () => {
+                imageModal.style.display = 'none';
+            });
+
+            // Add click listeners to images
+            images.forEach(image => {
+                image.addEventListener('click', () => {
+                    openModal(image.src);
+                });
+            });
+            
+            async function generateImage(prompt, seed, imageElement) {
+                return new Promise((resolve, reject) => {
+                    imageElement.onload = () => {
+                        resolve();
+                    };
+                    imageElement.onerror = () => {
+                        reject();
+                    };
+                    imageElement.src = `https://pollinations.ai/p/${prompt}&seed=${seed}`;
+                    imageElement.style.display = 'block';
+                });
+            }
+            
+            async function handleImageGeneration() {
+                loaderContainer.style.display = 'block';
+                imageLoader.style.width = '0%';
+                const prompt = promptInput.value + ", no logos";
+                const interval = setInterval(() => {
+                    imageLoader.style.width = `${Math.min(parseInt(imageLoader.style.width) || 0 + 2, 95)}%`;
+                }, 50);
+            
+                try {
+                    const seeds = [Math.random(), Math.random(), Math.random(), Math.random(), Math.random(), Math.random()];
+                    await Promise.all(images.map((image, index) => generateImage(prompt, seeds[index], image)));
+                    clearInterval(interval);
+                    imageLoader.style.width = '100%';
+                    loaderContainer.style.display = 'none';
+                    errorMessage.style.display = 'none';
+                } catch (error) {
+                    clearInterval(interval);
+                    console.error("Error generating image:", error);
+                    errorMessage.style.display = 'block';
+                    images.forEach(image => image.style.display = 'none');
+                    loaderContainer.style.display = 'none';
+                }
+            }
+
+            promptInput.addEventListener('keyup', async (e) => {
+                if (e.key === 'Enter') {
+                    handleImageGeneration();
+                }
+            });
+
+            generateButton.addEventListener('click', handleImageGeneration);
+        }
+
+        init();
+    </script>
+</body>
+</html>
