@@ -22,7 +22,10 @@
         }
         #image-container {
             margin-top: 20px;
-            width: 100%;
+            margin-bottom: 60px;
+            margin-left: 20%;
+            margin-right: 20%;
+            width: 90%;
             padding-bottom: 10px; 
             display: grid;
             grid-template-columns: repeat(3, 1fr); /* Three columns */
@@ -31,7 +34,7 @@
             align-items: center; /* Center items vertically */
         }
         .generated-image {
-            margin-top: 5px;
+            margin-top: 40px;
             margin-left: 5px;
             margin-right: 5px;
             max-width: 100%;
@@ -282,7 +285,7 @@
             async function handleImageGeneration() {
                 loaderContainer.style.display = 'block';
                 imageLoader.style.width = '0%';
-                const prompt = promptInput.value + ", no logos";
+                const prompt = promptInput.value + "&nologo=true";
                 const interval = setInterval(() => {
                     imageLoader.style.width = `${Math.min(parseInt(imageLoader.style.width) || 0 + 2, 95)}%`;
                 }, 50);
