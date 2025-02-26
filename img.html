@@ -146,12 +146,6 @@
         <img id="generated-image-4" src="" alt="Generated Image 4" class="generated-image" style="display:none;">
         <img id="generated-image-5" src="" alt="Generated Image 5" class="generated-image" style="display:none;">
         <img id="generated-image-6" src="" alt="Generated Image 6" class="generated-image" style="display:none;">
-        <!-- <img id="generated-image-7" src="" alt="Generated Image 7" class="generated-image" style="display:none;">
-        <img id="generated-image-8" src="" alt="Generated Image 8" class="generated-image" style="display:none;">
-        <img id="generated-image-9" src="" alt="Generated Image 9" class="generated-image" style="display:none;">
-        <img id="generated-image-10" src="" alt="Generated Image 10" class="generated-image" style="display:none;">
-        <img id="generated-image-11" src="" alt="Generated Image 11" class="generated-image" style="display:none;">
-        <img id="generated-image-12" src="" alt="Generated Image 12" class="generated-image" style="display:none;"> -->
         <p id="error-message" style="color: red; display: none;">Error generating image.</p>
     </div>
 
@@ -246,18 +240,12 @@
             const generatedImage3 = document.getElementById('generated-image-3');
             const generatedImage4 = document.getElementById('generated-image-4');
             const generatedImage5 = document.getElementById('generated-image-5');
-            const generatedImage6 = document.getElementById('generated-image-6');
-            const generatedImage7 = document.getElementById('generated-image-7');
-            const generatedImage8 = document.getElementById('generated-image-8');
-            const generatedImage9 = document.getElementById('generated-image-9');
-            const generatedImage10 = document.getElementById('generated-image-10');
-            const generatedImage11 = document.getElementById('generated-image-11');
-            const generatedImage12 = document.getElementById('generated-image-12');    
+            const generatedImage6 = document.getElementById('generated-image-6');  
             const errorMessage = document.getElementById('error-message');
             const generateButton = document.getElementById('generate-button');
             const imageLoader = document.getElementById('image-loader');
             const loaderContainer = document.querySelector('.loader-container');
-            const images = [generatedImage1, generatedImage2, generatedImage3, generatedImage4, generatedImage5, generatedImage6, generatedImage7, generatedImage8, generatedImage9, generatedImage10, generatedImage11, generatedImage12];
+            const images = [generatedImage1, generatedImage2, generatedImage3, generatedImage4, generatedImage5, generatedImage6];
 
             const imageModal = document.getElementById('imageModal');
             const modalImage = document.getElementById('modalImage');
@@ -303,7 +291,7 @@
                 }, 50);
             
                 try {
-                    const seeds = [Math.random(), Math.random()+100, Math.random()+200, Math.random()+300, Math.random()+400, Math.random()+500, Math.random()+600, Math.random()+700, Math.random()+800, Math.random()+900, Math.random()+1000, Math.random()+1100];
+                    const seeds = [Math.random(), Math.random(), Math.random(), Math.random(), Math.random(), Math.random()];
                     await Promise.all(images.map((image, index) => generateImage(prompt, seeds[index], image)));
                     clearInterval(interval);
                     imageLoader.style.width = '100%';
