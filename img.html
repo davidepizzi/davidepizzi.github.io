@@ -277,7 +277,7 @@
                     imageElement.onerror = () => {
                         reject();
                     };
-                    imageElement.src = `https://pollinations.ai/p/${prompt}&model=flux&nologo=true&seed=${seed}`;
+                    imageElement.src = `https://pollinations.ai/p/${prompt}&nologo=true&seed=${seed}&enhance=true&private=true`;
                     imageElement.style.display = 'block';
                 });
             }
