@@ -289,7 +289,7 @@
                     imageElement.onerror = () => {
                         reject();
                     };
-                    imageElement.src = `https://pollinations.ai/p/${prompt}&seed=${seed}`;
+                    imageElement.src = `https://pollinations.ai/p/${prompt}&seed=${seed}&model=flux&nologo=true`;
                     imageElement.style.display = 'block';
                 });
             }
@@ -297,7 +297,7 @@
             async function handleImageGeneration() {
                 loaderContainer.style.display = 'block';
                 imageLoader.style.width = '0%';
-                const prompt = promptInput.value + "&model=flux&nologo=true";
+                const prompt = promptInput.value;
                 const interval = setInterval(() => {
                     imageLoader.style.width = `${Math.min(parseInt(imageLoader.style.width) || 0 + 2, 95)}%`;
                 }, 50);
