@@ -297,7 +297,7 @@
             async function handleImageGeneration() {
                 loaderContainer.style.display = 'block';
                 imageLoader.style.width = '0%';
-                const prompt = promptInput.value + "&nologo=true";
+                const prompt = promptInput.value + "&model=flux&nologo=true";
                 const interval = setInterval(() => {
                     imageLoader.style.width = `${Math.min(parseInt(imageLoader.style.width) || 0 + 2, 95)}%`;
                 }, 50);
