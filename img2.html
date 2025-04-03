@@ -383,7 +383,7 @@
         window.addEventListener('load', () => { // Removed async
             loadPromptHistory();
             // No await fetchOllamaModels();
-            if (negativePromptInput) { negativePromptInput.value = STANDARD_NEGATIVE_KEYWORDS.join(', '); } else { console.error(" textarea not found!"); }
+            if (negativePromptInput) { negativePromptInput.value = STANDARD_NEGATIVE_KEYWORDS.join(', '); } else { console.error("Negative prompt textarea not found!"); }
             if (ollamaModelInput && ollamaModelDisplay) { ollamaModelDisplay.textContent = ollamaModelInput.value; } // Set initial display
             if (loadHistoryBtn) { loadHistoryBtn.addEventListener('click', handleLoadFromHistory); console.log("Load History listener attached."); } else { console.error("Load History button not found!"); }
 
