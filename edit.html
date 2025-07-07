@@ -14,7 +14,7 @@
         }
         
         body {
-            background: linear-gradient(135deg, #0f1a30, #1d3557, #0a2a52);
+            background: linear-gradient(135deg, #0c1e3e, #1a3a6c, #0a2a52);
             color: #e0f0ff;
             min-height: 100vh;
             padding: 20px;
@@ -28,7 +28,7 @@
         
         header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             padding: 30px;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 20px;
@@ -71,7 +71,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
         
         @media (max-width: 900px) {
@@ -215,6 +215,7 @@
             max-width: 100%;
             max-height: 350px;
             display: none;
+            border-radius: 10px;
         }
         
         .no-preview {
@@ -470,6 +471,25 @@
             max-height: 200px;
             overflow: auto;
         }
+        
+        .clear-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            color: white;
+            cursor: pointer;
+            display: none;
+        }
+        
+        .url-input-container {
+            position: relative;
+        }
     </style>
 </head>
 <body>
@@ -503,6 +523,7 @@
                 <div class="tab-content" id="url-tab">
                     <div class="url-input-container">
                         <input type="text" id="imageUrl" class="url-input" placeholder="Paste image URL (e.g. https://example.com/image.jpg)">
+                        <button class="clear-btn" id="clearUrlBtn">×</button>
                     </div>
                 </div>
                 
@@ -613,6 +634,7 @@
         const imagePreview = document.getElementById('imagePreview');
         const noPreview = document.getElementById('noPreview');
         const imageUrlInput = document.getElementById('imageUrl');
+        const clearUrlBtn = document.getElementById('clearUrlBtn');
         const promptInput = document.getElementById('promptInput');
         const modelSelect = document.getElementById('image-model');
         const generateBtn = document.getElementById('generateBtn');
@@ -626,6 +648,10 @@
         const debugInfo = document.getElementById('debugInfo');
         const retryTip = document.getElementById('retryTip');
         const modelStatus = document.getElementById('modelStatus');
+        
+        // State variables
+        let currentFile = null;
+        let currentImageUrl = '';
         
         // Event Listeners
         uploadArea.addEventListener('click', () => imageUpload.click());
@@ -656,7 +682,10 @@
         
         imageUrlInput.addEventListener('input', function() {
             if (this.value) {
-                // Show preview if it's a valid image URL
+                clearUrlBtn.style.display = 'block';
+                currentImageUrl = this.value;
+                
+                // Show preview
                 imagePreview.src = this.value;
                 imagePreview.style.display = 'block';
                 noPreview.style.display = 'none';
@@ -666,9 +695,19 @@
                     showStatus('Could not load image from URL', 'error');
                 };
             } else {
+                clearUrlBtn.style.display = 'none';
+                currentImageUrl = '';
                 imagePreview.style.display = 'none';
                 noPreview.style.display = 'block';
             }
+        });
+        
+        clearUrlBtn.addEventListener('click', () => {
+            imageUrlInput.value = '';
+            clearUrlBtn.style.display = 'none';
+            currentImageUrl = '';
+            imagePreview.style.display = 'none';
+            noPreview.style.display = 'block';
         });
         
         modelSelect.addEventListener('change', function() {
@@ -695,11 +734,6 @@
                 // Show corresponding content
                 const tabId = tab.getAttribute('data-tab');
                 document.getElementById(`${tabId}-tab`).classList.add('active');
-                
-                // Clear URL input when switching to upload tab
-                if (tabId === 'upload') {
-                    imageUrlInput.value = '';
-                }
             });
         });
         
@@ -709,6 +743,8 @@
                 showStatus('Please upload an image file (JPEG, PNG, etc.)', 'error');
                 return;
             }
+            
+            currentFile = file;
             
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -757,12 +793,6 @@
         
         async function generateImage() {
             // Validate inputs
-            if (!imagePreview.src || imagePreview.src === '#' || 
-                (imageUrlInput.value === '' && imagePreview.src.includes('data:image'))) {
-                showStatus('Please upload an image or enter a valid URL', 'error');
-                return;
-            }
-            
             if (!promptInput.value.trim()) {
                 showStatus('Please enter transformation instructions', 'error');
                 return;
@@ -783,19 +813,25 @@
             try {
                 const prompt = encodeURIComponent(promptInput.value.trim());
                 
-                // Determine image source (URL input or uploaded image)
+                // Determine if we have a reference image
                 let sourceImage = '';
-                if (imageUrlInput.value) {
-                    sourceImage = imageUrlInput.value;
-                } else {
-                    sourceImage = imagePreview.src;
+                
+                // Check if we have a URL input
+                if (currentImageUrl) {
+                    sourceImage = currentImageUrl;
+                } 
+                // Check if we have an uploaded file
+                else if (currentFile) {
+                    sourceImage = imagePreview.src; // Use the data URL
                 }
                 
-                // Encode the image source
-                const encodedImage = encodeURIComponent(sourceImage);
+                // Construct base API URL
+                let apiUrl = `https://image.pollinations.ai/prompt/${prompt}?model=${model}&nologo=true&t=${Date.now()}`;
                 
-                // Construct Pollinations API URL with CORRECT parameters
-                const apiUrl = `https://image.pollinations.ai/prompt/${prompt}?model=${model}&img=${encodedImage}&nologo=true&t=${Date.now()}`;
+                // Add image parameter only if we have a source image
+                if (sourceImage) {
+                    apiUrl += `&img=${encodeURIComponent(sourceImage)}`;
+                }
                 
                 // Log the API URL for debugging
                 debugInfo.innerHTML = `<strong>API Request:</strong><br>${apiUrl}`;
@@ -803,8 +839,11 @@
                 // Set status
                 showStatus(`Sending request to Pollinations.ai using ${model} model...`, 'success');
                 
+                // Use proxy to avoid CORS issues
+                const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(apiUrl);
+                
                 // Use fetch to get the image with error handling
-                const response = await fetch(apiUrl);
+                const response = await fetch(proxyUrl);
                 
                 if (!response.ok) {
                     throw new Error(`API returned ${response.status} ${response.statusText}`);
@@ -844,7 +883,7 @@
                 
                 // Special handling for kontext and gptimage
                 if (model === 'kontext' || model === 'gptimage') {
-                    errorMessage = `The ${model} model may not be working properly. Try flux or turbo for more reliable results.`;
+                    errorMessage = `The ${model} model may not be working properly. Try flux or turbo for more reliable results. (${errorMessage})`;
                 }
                 
                 resultStatus.textContent = `Error: ${errorMessage}`;
@@ -866,12 +905,12 @@
             statusMessage.style.display = 'block';
         }
         
-        // Initialize with example
+        // Initialize
         window.addEventListener('load', () => {
-            imageUrlInput.value = "https://images.unsplash.com/photo-1501854140801-50d01698950b";
-            imagePreview.src = imageUrlInput.value;
-            imagePreview.style.display = 'block';
-            noPreview.style.display = 'none';
+            promptInput.value = "Transform into a watercolor painting with soft pastel colors";
+            imagePreview.style.display = 'none';
+            noPreview.style.display = 'block';
+            clearUrlBtn.style.display = 'none';
         });
     </script>
 </body>
