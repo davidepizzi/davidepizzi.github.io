@@ -120,24 +120,6 @@
         .tab-content legend { /* Style legend inside tabs if needed, e.g., smaller */ font-size: 0.85em; margin-bottom: 8px; }
         .tab-content .control-group { margin-bottom: 12px; /* Adjust spacing inside tabs */ }
 
-        /* --- Edit Modal Styles --- */
-        .edit-modal { display: none; position: fixed; z-index: 1001; /* Higher than lightbox */ left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); overflow: auto; backdrop-filter: blur(5px); }
-        .edit-modal-content { background-color: var(--bg-panel); margin: 5% auto; padding: 25px; border: 1px solid var(--border-color); width: 90%; max-width: 800px; border-radius: 8px; box-shadow: var(--box-shadow-panel); display: grid; grid-template-columns: 1fr 1fr; gap: 20px; position: relative; }
-        .edit-modal-close { position: absolute; top: 10px; right: 15px; color: var(--text-secondary); font-size: 28px; font-weight: bold; cursor: pointer; }
-        .edit-modal-close:hover { color: var(--text-primary); }
-        .edit-modal-image-container { text-align: center; }
-        .edit-modal-image-container img { max-width: 100%; height: auto; border-radius: var(--border-radius); border: 1px solid var(--border-color); }
-        .edit-modal-controls h3 { margin-top: 0; margin-bottom: 15px; font-weight: 500; color: var(--text-primary); }
-        .edit-modal-controls textarea { min-height: 100px; margin-bottom: 15px; }
-        .edit-modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-        .preset-actions-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
-        .preset-actions-container button { background-color: var(--accent-gray); font-size: 0.8em; padding: 5px 10px; }
-
-        @media (max-width: 768px) {
-            .edit-modal-content { grid-template-columns: 1fr; margin: 10% auto; padding: 20px; }
-            .edit-modal-image-container { margin-bottom: 15px; }
-        }
-
         /* --- Responsive Overrides --- */
         @media (max-width: 991px) { .layout-grid { grid-template-columns: 1fr; } }
         @media (max-width: 768px) { /* ... responsive styles ... */ body { font-size: 13px; padding: 10px; } .container { padding: 15px; margin: 10px auto; } h1 { font-size: 1.4em; margin-bottom: 20px; } fieldset:not(.tab-content fieldset) { padding: 10px 12px 12px; margin-bottom: 15px; } .control-group { flex-direction: column; align-items: stretch; } .control-group label { margin-bottom: 4px; } .main-actions button { width: 100%; margin-bottom: 8px; padding: 10px; } #image-container { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; padding: 10px; } .lightbox-prev, .lightbox-next { font-size: 18px; width: 36px; height: 36px; padding: 8px 10px; } .lightbox-close { font-size: 22px; top: 10px; right: 15px; width: 34px; height: 34px; } .lightbox-content { width: 96%; height: 90%; } .tab-button { font-size: 0.75em; padding: 5px 8px; } }
@@ -241,18 +223,10 @@
 
                  <fieldset><legend>Nano Banana Controls</legend>
                     <div class="control-group">
-                        <label for="accessTokenInput">Access Token:</label>
-                        <input type="text" id="accessTokenInput" placeholder="Enter your GCP Access Token...">
+                        <label for="apiKeyInput">API Key:</label>
+                        <input type="text" id="apiKeyInput" placeholder="Enter your Gemini API key...">
+                        <button id="saveApiKeyBtn" class="apply-btn">Save</button>
                     </div>
-                    <div class="control-group">
-                        <label for="projectIdInput">Project ID:</label>
-                        <input type="text" id="projectIdInput" placeholder="Enter your GCP Project ID...">
-                    </div>
-                    <div class="control-group">
-                        <label for="regionInput">Region:</label>
-                        <input type="text" id="regionInput" value="us-central1">
-                    </div>
-                    <button id="saveApiConfigBtn" class="apply-btn">Save Config</button>
                  </fieldset>
 
                  <fieldset><legend>Ollama Controls</legend>
@@ -268,36 +242,11 @@
 
     <!-- Lightbox Structure -->
     <div id="lightbox" class="lightbox">
-        <button id="lightboxEditBtn" class="apply-btn" style="position: absolute; top: 20px; right: 80px;">Edit</button>
         <button class="lightbox-close" id="lightboxCloseBtn" title="Close">&times;</button>
         <button class="lightbox-prev" id="lightboxPrevBtn" title="Previous">&#10094;</button>
         <button class="lightbox-next" id="lightboxNextBtn" title="Next">&#10095;</button>
         <div class="lightbox-content">
             <img src="" alt="Zoomed Image" id="lightboxImage" class="lightbox-image">
-        </div>
-    </div>
-
-    <!-- Edit Modal Structure -->
-    <div id="editModal" class="edit-modal">
-        <div class="edit-modal-content">
-            <span class="edit-modal-close" id="editModalCloseBtn">&times;</span>
-            <div class="edit-modal-image-container">
-                <h3>Original Image</h3>
-                <img src="" alt="Image to edit" id="editModalImage">
-            </div>
-            <div class="edit-modal-controls">
-                <h3>Edit with Nano Banana</h3>
-                <label for="editPromptInput">Edit Prompt:</label>
-                <textarea id="editPromptInput" rows="4" placeholder="e.g., 'Change the background to a sunny beach'"></textarea>
-                <label>Preset Actions:</label>
-                <div class="preset-actions-container" id="presetActions">
-                    <!-- Preset buttons will be dynamically added here -->
-                </div>
-                <div class="edit-modal-actions">
-                    <button id="cancelEditBtn" class="clear-btn">Cancel</button>
-                    <button id="submitEditBtn" class="apply-btn">Submit Edit</button>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -344,24 +293,13 @@
         const lightbox = document.getElementById('lightbox');
         const lightboxImage = document.getElementById('lightboxImage');
         const lightboxCloseBtn = document.getElementById('lightboxCloseBtn');
-        const lightboxEditBtn = document.getElementById('lightboxEditBtn');
         const lightboxPrevBtn = document.getElementById('lightboxPrevBtn');
         const lightboxNextBtn = document.getElementById('lightboxNextBtn');
-        const accessTokenInput = document.getElementById('accessTokenInput');
-        const projectIdInput = document.getElementById('projectIdInput');
-        const regionInput = document.getElementById('regionInput');
-        const saveApiConfigBtn = document.getElementById('saveApiConfigBtn');
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
         // Tab Elements
         const tabButtons = document.querySelectorAll('.tab-button');
         const tabContents = document.querySelectorAll('.tab-content');
-        // Edit Modal Elements
-        const editModal = document.getElementById('editModal');
-        const editModalCloseBtn = document.getElementById('editModalCloseBtn');
-        const editModalImage = document.getElementById('editModalImage');
-        const editPromptInput = document.getElementById('editPromptInput');
-        const presetActionsContainer = document.getElementById('presetActions');
-        const cancelEditBtn = document.getElementById('cancelEditBtn');
-        const submitEditBtn = document.getElementById('submitEditBtn');
 
 
         // --- State Variables ---
@@ -369,6 +307,8 @@
 
         // --- Config ---
         const OLLAMA_ENDPOINT = 'http://localhost:11434'; const POLLINATIONS_BASE_URL = 'https://image.pollinations.ai/prompt/'; const PROMPT_HISTORY_KEY = 'promptHistory_v2'; const MAX_HISTORY_SIZE = 30; const INTER_REQUEST_DELAY_MS = 400; const STANDARD_NEGATIVE_KEYWORDS = [ "ugly", "tiling", "poorly drawn hands", "poorly drawn feet", "poorly drawn face", "out of frame", "extra limbs", "disfigured", "deformed", "body out of frame", "bad anatomy", "watermark", "signature", "cut off", "low contrast", "underexposed", "overexposed", "bad art", "beginner", "amateur", "weird colors", "blurry", "text", "words", "letters", "too many fingers", "username", "artist name", "error", "duplicate" ];
+        const API_KEY_KEY = 'gemini_api_key';
+
         // --- Helper Functions ---
         function showStatus(message, type = 'info', duration = 0) { statusDiv.textContent = message; statusDiv.className = `status-message ${type}`; if (duration > 0) { setTimeout(clearStatus, duration); } }
         function clearStatus() { if (!statusDiv.classList.contains('error') && !statusDiv.classList.contains('warning')) { statusDiv.textContent = ''; statusDiv.className = 'status-message'; } }
@@ -461,41 +401,7 @@
              if(ollamaModelDisplay) ollamaModelDisplay.textContent = e.target.value || 'N/A';
          });
          // Apply button listeners are already set up above in "Style & Keywords"
-         imageContainer.addEventListener('click', function(event) {
-            if (event.target.tagName === 'IMG' && !event.target.closest('.image-placeholder')) {
-                openLightbox(event.target.src); // Restore lightbox functionality
-            }
-         });
-
-         // Lightbox listeners (can be kept for now or removed if lightbox is fully deprecated)
-         lightboxCloseBtn.addEventListener('click', closeLightbox);
-         lightboxEditBtn.addEventListener('click', () => {
-            const currentImageSrc = lightboxImage.src;
-            closeLightbox();
-            openEditModal(currentImageSrc);
-         });
-         lightboxPrevBtn.addEventListener('click', showPrevImage);
-         lightboxNextBtn.addEventListener('click', showNextImage);
-         lightbox.addEventListener('click', function(event) { if (event.target === lightbox) { closeLightbox(); } });
-
-         // Edit Modal listeners
-         editModalCloseBtn.addEventListener('click', closeEditModal);
-         cancelEditBtn.addEventListener('click', closeEditModal);
-         editModal.addEventListener('click', function(event) { if (event.target === editModal) { closeEditModal(); } });
-
-
-         document.addEventListener('keydown', function(event) {
-            if (lightbox.style.display === 'block') {
-                if (event.key === 'Escape') { closeLightbox(); }
-                else if (event.key === 'ArrowLeft') { showPrevImage(); }
-                else if (event.key === 'ArrowRight') { showNextImage(); }
-            } else if (editModal.style.display === 'block') {
-                if (event.key === 'Escape') { closeEditModal(); }
-            }
-         });
-
-         promptInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); generateImages(); } });
-         modificationInstructionInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); modifyPromptAI(); } });
+         imageContainer.addEventListener('click', function(event) { if (event.target.tagName === 'IMG' && !event.target.closest('.image-placeholder')) { openLightbox(event.target.src); } }); lightboxCloseBtn.addEventListener('click', closeLightbox); lightboxPrevBtn.addEventListener('click', showPrevImage); lightboxNextBtn.addEventListener('click', showNextImage); lightbox.addEventListener('click', function(event) { if (event.target === lightbox) { closeLightbox(); } }); document.addEventListener('keydown', function(event) { if (lightbox.style.display === 'block') { if (event.key === 'Escape') { closeLightbox(); } else if (event.key === 'ArrowLeft') { showPrevImage(); } else if (event.key === 'ArrowRight') { showNextImage(); } } }); promptInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); generateImages(); } }); modificationInstructionInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); modifyPromptAI(); } });
 
          // Add Tab Button Listeners
          tabButtons.forEach(button => {
@@ -503,164 +409,33 @@
          });
 
 
-        // --- Nano Banana (Imagen) API Interaction ---
-        async function getImageAsBase64(url) {
-            const response = await fetch(url);
-            const blob = await response.blob();
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result.split(',')[1]);
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
-            });
-        }
-
-        async function callImagenApi(prompt, imageBase64) {
-            const accessToken = localStorage.getItem('gcp_access_token');
-            const projectId = localStorage.getItem('gcp_project_id');
-            const region = localStorage.getItem('gcp_region');
-
-            if (!accessToken || !projectId || !region) {
-                throw new Error('API Config not found. Please save it in the Nano Banana Controls.');
-            }
-
-            const API_URL = `https://${region}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${region}/publishers/google/models/imagen-3.0-capability-001:predict`;
-
-            const body = {
-                "instances": [
-                    {
-                        "prompt": prompt,
-                        "referenceImages": [
-                            {
-                                "referenceType": "REFERENCE_TYPE_RAW",
-                                "referenceImage": { "bytesBase64Encoded": imageBase64 }
-                            },
-                            {
-                                "referenceType": "REFERENCE_TYPE_MASK",
-                                "referenceImage": { "bytesBase64Encoded": imageBase64 },
-                                "maskImageConfig": { "maskMode": "MASK_MODE_SEMANTIC" }
-                            }
-                        ]
-                    }
-                ],
-                "parameters": {
-                    "editMode": "EDIT_MODE_INPAINT_INSERTION",
-                    "sampleCount": 1
-                }
-            };
-
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json; charset=utf-8'
-                },
-                body: JSON.stringify(body)
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`Imagen API Error: ${errorData.error.message}`);
-            }
-
-            const data = await response.json();
-            return data.predictions[0].bytesBase64Encoded;
-        }
-
-        async function handleImageEdit() {
-            const prompt = document.getElementById('editPromptInput').value.trim();
-            if (!prompt) {
-                showStatus('Please enter an edit prompt.', 'warning', 3000);
-                return;
-            }
-
-            showStatus('Editing image with Nano Banana...', 'loading');
-            document.getElementById('editModal').style.display = 'none';
-            document.body.style.overflow = '';
-
-            try {
-                const imageBase64 = await getImageAsBase64(document.getElementById('editModalImage').src);
-                const newImageBase64 = await callImagenApi(prompt, imageBase64);
-
-                const newImage = document.createElement('img');
-                newImage.src = `data:image/png;base64,${newImageBase64}`;
-                imageContainer.appendChild(newImage);
-                currentBatchImageSources.push(newImage.src);
-
-                showStatus('Image edited successfully!', 'success', 4000);
-            } catch (error) {
-                console.error('Imagen Edit Error:', error);
-                showStatus(error.message, 'error');
-            }
-        }
-
-
-        // --- API Config Management ---
-        const ACCESS_TOKEN_KEY = 'gcp_access_token';
-        const PROJECT_ID_KEY = 'gcp_project_id';
-        const REGION_KEY = 'gcp_region';
-
-        function saveApiConfig() {
-            const accessToken = accessTokenInput.value.trim();
-            const projectId = projectIdInput.value.trim();
-            const region = regionInput.value.trim();
-
-            if (accessToken && projectId && region) {
-                localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-                localStorage.setItem(PROJECT_ID_KEY, projectId);
-                localStorage.setItem(REGION_KEY, region);
-                showStatus('API Config saved.', 'success', 2000);
+        // --- API Key Management ---
+        function saveApiKey() {
+            const apiKey = apiKeyInput.value.trim();
+            if (apiKey) {
+                localStorage.setItem(API_KEY_KEY, apiKey);
+                showStatus('API Key saved.', 'success', 2000);
             } else {
-                showStatus('All API config fields are required.', 'warning', 3000);
+                showStatus('API Key cannot be empty.', 'warning', 3000);
             }
         }
 
-        function loadApiConfig() {
-            const accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
-            const projectId = localStorage.getItem(PROJECT_ID_KEY);
-            const region = localStorage.getItem(REGION_KEY);
-
-            if (accessToken) accessTokenInput.value = accessToken;
-            if (projectId) projectIdInput.value = projectId;
-            if (region) regionInput.value = region;
+        function loadApiKey() {
+            const apiKey = localStorage.getItem(API_KEY_KEY);
+            if (apiKey) {
+                apiKeyInput.value = apiKey;
+            }
         }
 
         // --- Initialisation ---
-
-        const presetActions = [
-            { name: 'Zoom Out', prompt: 'Zoom out and show more of the environment' },
-            { name: 'Zoom In Face', prompt: 'Zoom in on the main subject\'s face' },
-            { name: 'Low Angle', prompt: 'Change the point of view to a low angle shot' },
-            { name: 'High Angle', prompt: 'Change the point of view to a high angle shot' },
-            { name: 'Blur BG', prompt: 'Blur the background (bokeh)' },
-            { name: 'B&W', prompt: 'Convert the image to black and white' },
-            { name: 'Vintage', prompt: 'Apply a vintage film style' },
-            { name: 'Vibrant', prompt: 'Make the colors more vibrant and saturated' },
-            { name: 'Cinematic', prompt: 'Add cinematic lighting' },
-        ];
-
-        function populatePresetActions() {
-            presetActions.forEach(action => {
-                const button = document.createElement('button');
-                button.textContent = action.name;
-                button.title = action.prompt;
-                button.addEventListener('click', () => {
-                    editPromptInput.value = action.prompt;
-                });
-                presetActionsContainer.appendChild(button);
-            });
-        }
-
         window.addEventListener('load', () => { // Removed async
             loadPromptHistory();
-            loadApiConfig();
-            populatePresetActions();
+            loadApiKey();
             // No await fetchOllamaModels();
             if (negativePromptInput) { negativePromptInput.value = STANDARD_NEGATIVE_KEYWORDS.join(', '); } else { console.error("Negative prompt textarea not found!"); }
             if (ollamaModelInput && ollamaModelDisplay) { ollamaModelDisplay.textContent = ollamaModelInput.value; } // Set initial display
             if (loadHistoryBtn) { loadHistoryBtn.addEventListener('click', handleLoadFromHistory); console.log("Load History listener attached."); } else { console.error("Load History button not found!"); }
-            saveApiConfigBtn.addEventListener('click', saveApiConfig);
-            submitEditBtn.addEventListener('click', handleImageEdit);
+            saveApiKeyBtn.addEventListener('click', saveApiKey);
 
             // Ensure the default active tab content is displayed on load
             const activeTabContent = document.querySelector('.tab-content.active');
