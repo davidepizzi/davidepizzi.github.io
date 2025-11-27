@@ -77,12 +77,6 @@
         .image-placeholder small { /* ... placeholder small text styles ... */ font-size: 0.8em; margin-top: 4px; color: inherit; }
         .debug-url { /* ... debug url styles ... */ font-family: "Menlo", "Consolas", monospace; font-size: 0.7em; word-break: break-all; color: var(--text-placeholder); background-color: rgba(0,0,0,0.15); padding: 2px 4px; border-radius: 3px; margin-top: 6px; max-height: 30%; overflow-y: auto; display: block; text-align: left; width: 100%; border: 1px solid var(--border-color); }
         .image-placeholder.error .debug-url, .image-placeholder.cancelled .debug-url { /* ... error/cancelled debug url styles ... */ color: inherit; background-color: rgba(255,255,255,0.03); }
-
-        #image-container.loading {
-            opacity: 0.5;
-            cursor: wait;
-        }
-
         @keyframes spin { /* ... spin animation ... */ 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* --- Status & Info --- */
@@ -356,19 +350,6 @@
         // --- Lightbox Functions ---
         // (No changes needed in these functions for the tabs)
         function openLightbox(clickedSrc) { const imageIndex = currentBatchImageSources.indexOf(clickedSrc); if (imageIndex === -1 || currentBatchImageSources.length === 0) { console.error("Could not find clicked image source in current batch."); return; } currentLightboxIndex = imageIndex; updateLightboxView(); lightbox.style.display = 'block'; document.body.style.overflow = 'hidden'; } function closeLightbox() { lightbox.style.display = 'none'; document.body.style.overflow = ''; currentLightboxIndex = 0; } function updateLightboxView() { const totalImages = currentBatchImageSources.length; if (totalImages === 0 || currentLightboxIndex < 0 || currentLightboxIndex >= totalImages) { closeLightbox(); return; } lightboxImage.src = currentBatchImageSources[currentLightboxIndex]; lightboxPrevBtn.classList.toggle('disabled', currentLightboxIndex === 0); lightboxNextBtn.classList.toggle('disabled', currentLightboxIndex === totalImages - 1); } function showPrevImage() { if (currentLightboxIndex > 0) { currentLightboxIndex--; updateLightboxView(); } } function showNextImage() { if (currentLightboxIndex < currentBatchImageSources.length - 1) { currentLightboxIndex++; updateLightboxView(); } }
-
-        // --- Edit Modal Functions ---
-        function openEditModal(imageSrc) {
-            editModalImage.src = imageSrc;
-            editModal.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeEditModal() {
-            editModal.style.display = 'none';
-            document.body.style.overflow = '';
-            editPromptInput.value = '';
-        }
 
         // --- Tab Switching Logic ---
         function switchTab(event) {
